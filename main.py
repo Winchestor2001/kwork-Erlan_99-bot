@@ -1,23 +1,23 @@
 import asyncio
 import logging
 from aiogram import Bot, Dispatcher
-from aiogram.types import Message
-from aiogram.filters import CommandStart
+from aiogram.client.default import DefaultBotProperties
+
 from config import config
+from models import DB
 from parser import run_parser
+from handlers import router
 
-bot = Bot(token=config.TELEGRAM_BOT_TOKEN)
+bot = Bot(token=config.TELEGRAM_BOT_TOKEN, default=DefaultBotProperties(parse_mode='html'))
 dp = Dispatcher()
-
-
-@dp.message(CommandStart())
-async def start_handler(message: Message):
-    await message.answer("Привет! Бот запущен и готов к работе.")
 
 
 async def main():
     loop = asyncio.get_running_loop()
-    loop.create_task(asyncio.to_thread(run_parser))
+    # loop.create_task(asyncio.to_thread(run_parser))
+    with DB() as db:
+        db.create_tables()
+    dp.include_router(router)
     await dp.start_polling(bot)
 
 

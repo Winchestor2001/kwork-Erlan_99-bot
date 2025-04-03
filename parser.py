@@ -9,20 +9,24 @@ from telethon.tl.functions.channels import JoinChannelRequest
 from config import config
 from aiogram import Bot
 
+from models import DB
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-# Загружаем список групп
-with open("groups.json", "r", encoding="utf-8") as f:
-    GROUPS = json.load(f)
-
-# Загружаем ключевые слова
-with open("keywords.json", "r", encoding="utf-8") as f:
-    KEYWORDS = set(json.load(f))
+# # Загружаем список групп
+# with open("groups.json", "r", encoding="utf-8") as f:
+#     GROUPS = json.load(f)
+#
+# # Загружаем ключевые слова
+# with open("keywords.json", "r", encoding="utf-8") as f:
+#     KEYWORDS = set(json.load(f))
 
 client = TelegramClient(config.SESSION_NAME, config.API_ID, config.API_HASH)
 bot = Bot(token=config.TELEGRAM_BOT_TOKEN)
 
 ADMIN_IDS = list(map(int, config.ADMIN_IDS.split(",")))  # Конвертируем строку в список чисел
+GROUPS = DB().get_all_groups(make_list=True)
+KEYWORDS = DB().get_all_keywords(make_list=True)
 
 
 def is_relevant_post(message_text: str) -> bool:
@@ -68,7 +72,6 @@ async def join_groups():
                 logging.error(f"⚠️ Ошибка при вступлении в {group}: {e}")
 
 
-
 async def send_to_admins(text):
     """Отправляет найденное сообщение всем администраторам."""
     for admin_id in ADMIN_IDS:
@@ -110,8 +113,6 @@ async def process_message(event):
 
     else:
         logging.info(f"❌ Сообщение не подходит: {message_text}")
-
-
 
 
 async def start_parser():
@@ -156,7 +157,6 @@ async def start_parser():
         except Exception as e:
             logging.error(f"❌ Ошибка в парсере: {e}")
             await asyncio.sleep(10)
-
 
 
 def run_parser():
