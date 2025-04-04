@@ -74,7 +74,8 @@ async def join_groups():
 
 async def send_to_admins(text):
     """Отправляет найденное сообщение всем администраторам."""
-    for admin_id in ADMIN_IDS:
+    admins = DB().get_all_admins(make_list=True)
+    for admin_id in ADMIN_IDS + admins:
         try:
             await bot.send_message(admin_id, text, disable_web_page_preview=True)
             logging.info(f"📨 Сообщение отправлено админу {admin_id}")

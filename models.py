@@ -97,6 +97,8 @@ class DB:
 
     def get_all_users(self) -> List[dict]:
         """Get all users"""
+        if not self.conn or not self.cursor:
+            self.connect()
         try:
             self.cursor.execute("SELECT id, tg_id, username FROM users")
             return [{"id": row[0], "tg_id": row[1], "username": row[2]} for row in self.cursor.fetchall()]
@@ -135,14 +137,16 @@ class DB:
 
     def get_all_admins(self, make_list=False) -> str | list | None:
         """Get all admins with their user information"""
+        if not self.conn or not self.cursor:
+            self.connect()
         try:
-            # Debug: Show all admins
             self.cursor.execute("SELECT * FROM admins")
             admins = self.cursor.fetchall()
             if admins:
                 if make_list:
-                    return [row[1] for row in self.cursor.fetchall()]
+                    return [row[1] for row in admins]
                 return "\n".join([str(admin[1]) for admin in admins])
+            return None
         except sql.Error as e:
             print(f"Database error: {str(e)}")
             raise Exception(f"Error getting admins: {e}")
@@ -163,11 +167,16 @@ class DB:
 
     def get_all_groups(self, make_list=False) -> str | list | None:
         """Get all groups with their IDs"""
+        if not self.conn or not self.cursor:
+            self.connect()
         try:
             self.cursor.execute("SELECT id, group_link FROM groups")
-            if make_list:
-                return [row[1] for row in self.cursor.fetchall()]
-            return "\n".join([row[1] for row in self.cursor.fetchall()])
+            groups = self.cursor.fetchall()
+            if groups:
+                if make_list:
+                    return [row[1] for row in groups]
+                return "\n".join([row[1] for row in groups])
+            return None
         except sql.Error as e:
             raise Exception(f"Error getting groups: {e}")
 
@@ -187,11 +196,16 @@ class DB:
 
     def get_all_keywords(self, make_list=False) -> str | list | None:
         """Get all keywords with their IDs"""
+        if not self.conn or not self.cursor:
+            self.connect()
         try:
             self.cursor.execute("SELECT id, key_text FROM keywords")
-            if make_list:
-                return [row[1] for row in self.cursor.fetchall()]
-            return "\n".join([row[1] for row in self.cursor.fetchall()])
+            keywords = self.cursor.fetchall()
+            if keywords:
+                if make_list:
+                    return [row[1] for row in keywords]
+                return "\n".join([row[1] for row in keywords])
+            return None
         except sql.Error as e:
             raise Exception(f"Error getting keywords: {e}")
 

@@ -14,7 +14,7 @@ dp = Dispatcher()
 
 async def main():
     loop = asyncio.get_running_loop()
-    # loop.create_task(asyncio.to_thread(run_parser))
+    loop.create_task(asyncio.to_thread(run_parser))
     with DB() as db:
         db.create_tables()
     dp.include_router(router)
