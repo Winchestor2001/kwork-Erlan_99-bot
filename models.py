@@ -221,3 +221,29 @@ class DB:
         except sql.Error as e:
             self.conn.rollback()
             raise Exception(f"Error deleting keyword: {e}")
+
+    def delete_admin(self, admin_id: int | str) -> bool:
+        """Delete a admin"""
+        try:
+            self.cursor.execute(
+                "DELETE FROM admins WHERE user_id = ?",
+                (admin_id,)
+            )
+            self.conn.commit()
+            return self.cursor.rowcount > 0
+        except sql.Error as e:
+            self.conn.rollback()
+            raise Exception(f"Error deleting admin: {e}")
+
+    def delete_group(self, group: str) -> bool:
+        """Delete a group"""
+        try:
+            self.cursor.execute(
+                "DELETE FROM groups WHERE group_link = ?",
+                (group,)
+            )
+            self.conn.commit()
+            return self.cursor.rowcount > 0
+        except sql.Error as e:
+            self.conn.rollback()
+            raise Exception(f"Error deleting group: {e}")

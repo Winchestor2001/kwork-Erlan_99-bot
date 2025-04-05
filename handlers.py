@@ -33,11 +33,65 @@ async def add_admin_handler(message: Message):
         with DB() as db:
             db.add_admin(admin_id)
     except Exception as e:
-        await message.answer("Уже добавлен")
+        await message.answer("Уже добавлен или еще не вступил в бот")
         logging.info(e)
         return
 
     await message.answer("✅ Админ добавлен")
+
+
+@router.message(IsAdmin(), Command("del_admin"))
+async def del_admin_handler(message: Message):
+    command_parts = message.text.split(maxsplit=1)
+    if len(command_parts) < 2:
+        await message.answer(text="Не указано ID юзера")
+        return
+    admin_id = command_parts[1]
+    try:
+        with DB() as db:
+            db.delete_admin(admin_id)
+    except Exception as e:
+        await message.answer("Не получилось удалить")
+        logging.info(e)
+        return
+
+    await message.answer("✅ Админ удален")
+
+
+@router.message(IsAdmin(), Command("del_group"))
+async def del_group_handler(message: Message):
+    command_parts = message.text.split(maxsplit=1)
+    if len(command_parts) < 2:
+        await message.answer(text="Не указано ссылка группы")
+        return
+    group_link = command_parts[1]
+    try:
+        with DB() as db:
+            db.delete_group(group_link)
+    except Exception as e:
+        await message.answer("Не получилось удалить")
+        logging.info(e)
+        return
+
+    await message.answer("✅ Группа удален")
+
+
+@router.message(IsAdmin(), Command("del_word"))
+async def del_keyword_handler(message: Message):
+    command_parts = message.text.split(maxsplit=1)
+    if len(command_parts) < 2:
+        await message.answer(text="Не указано фраза")
+        return
+    group_link = command_parts[1]
+    try:
+        with DB() as db:
+            db.delete_keyword(group_link)
+    except Exception as e:
+        await message.answer("Не получилось удалить")
+        logging.info(e)
+        return
+
+    await message.answer("✅ Фраза удален")
 
 
 @router.message(IsAdmin(), Command("add_word"))
